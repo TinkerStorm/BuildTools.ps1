@@ -12,24 +12,23 @@ $splitVersions = $versions -Split ","
 function Build-Revisions {
   param (
     [Parameter(Mandatory = $true)] [string] $javaHome,
-    [Parameter(Mandatory = $true)] [string[]] $revisions
+    [Parameter(Mandatory = $true)] [string] $revision
   )
 
-  foreach ($rev in $revisions) {
-    if ($versions -ne '*' -and $versions -notcontains $rev) {
-      Write-Host "$rev not found in revision filter, skipping..."
-      Continue
-    }
+  Write-Host "Checking $revision in $splitVersions"
+  if (($versions -ne '*') -and ($revision -notin $splitVersions)) {
+    Write-Host "$revision not found in revision filter, skipping..."
+    Continue
+  }
 
-    $folder = ($javaHome -Split "\\")[-1]
-    Write-Host "Compiling $pipeline for $rev on '$($folder)'"
+  $folder = ($javaHome -Split "\\")[-1]
+  Write-Host "Compiling $pipeline for $revision on '$($folder)'"
 
-    & "$javaHome\bin\java.exe" -jar $PSScriptRoot/BuildTools.jar --remapped --compile=$pipeline --rev $rev
+  & "$javaHome\bin\java.exe" -jar $PSScriptRoot/BuildTools.jar --remapped --compile=$pipeline --rev $revision
 
-    if ($LASTEXITCODE -ne 0) {
-      Write-Host "Error occurred for $revision on $folder using $pipeline"
-      exit $LASTEXITCODE
-    }
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "Error occurred for $revision on $folder using $pipeline"
+    exit $LASTEXITCODE
   }
 }
 
@@ -69,32 +68,33 @@ $runtimes = @(
 
 function Invoke-Build {
   foreach ($runtime in $runtimes) {
-    if ($runtime.Revisions.Count -eq 0) {
-      Write-Host "No revisions to build on $($runtime.Label), skipping..."
-      continue
-    }
-
     foreach ($revision in $runtime.Revisions) {
-      Build-Revisions -javaHome $runtime.Binary -revisions $runtime.Revisions
+      Build-Revisions -javaHome $runtime.Binary -revision $revision
     }
   }
 }
 
 function Invoke-Deploy {
-  $revisions = Foreach-Object -InputObject $runtimes -Process { $_.Revisions }
+  $revisions = Foreach-Object -InputObject $runtimes -Process { $_.Revisions } |
+    Where-Object { Test-Path "$PSScriptRoot/$pipeline-$_.jar" }
 
   if ($versions -ne '*') {
     $revisions = $revisions | Where-Object { $splitVersions -NotContains $_ }
+  }
+
+  if ($revisions.Count -eq 0) {
+    Write-Host "No revisions available to install/deploy."
+    Exit 1
   }
 
   Deploy-Revisions -Revisions $revisions
 }
 
 switch ($cmd) {
-  { @('c', 'compile', 'b', 'build') } { Invoke-Build }
-  { @('i', 'install', 'd', 'deploy') } { Invoke-Deploy }
+  { @('c', 'compile', 'b', 'build') -contains $_ } { Invoke-Build }
+  { @('i', 'install', 'd', 'deploy') -contains $_ } { Invoke-Deploy }
   default {
     Write-Host "Please use either '(c)ompile/(b)uild' or '(i)nstall/(d)eploy' as `$cmd"
-    exit 0
+    Exit 0
   }
 }
