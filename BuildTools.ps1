@@ -23,8 +23,13 @@ function Build-Revisions {
 
   $folder = ($javaHome -Split "\\")[-1]
   Write-Host "Compiling $pipeline for $revision on '$($folder)'"
+  $revision -match "\d\.(\d{1,2})(?:\.\d+)?"
 
-  & "$javaHome\bin\java.exe" -jar $PSScriptRoot/BuildTools.jar --remapped --compile=$pipeline --rev $revision
+  if ($Matches[0] -ge 18) {
+    & "$javaHome\bin\java.exe" -jar $PSScriptRoot\BuildTools.jar --remapped --compile=$pipeline --rev $revision
+  } else {
+    & "$javaHome\bin\java.exe" -jar $PSScriptRoot\BuildTools.jar --compile=$pipeline --rev $revision
+  }
 
   if ($LASTEXITCODE -ne 0) {
     Write-Host "Error occurred for $revision on $folder using $pipeline"
