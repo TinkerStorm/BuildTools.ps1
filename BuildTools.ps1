@@ -62,7 +62,7 @@ $runtimes = @(
     Binary = $env:JAVA_16_HOME
   }
   [PSCustomObject] @{
-    Revisions = @('1.18.1', '1.18.2', '1.19', '1.19.3', '1.20.2');
+    Revisions = @('1.18.1', '1.18.2', '1.19', '1.19.3', '1.20.1', '1.20.2', '1.20.4');
     Binary    = $env:JAVA_17_HOME
   },
   [PSCustomObject] @{
