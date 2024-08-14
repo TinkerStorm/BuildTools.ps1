@@ -38,7 +38,7 @@ function Deploy-Revisions {
   )
 
   foreach ($rev in $revisions) {
-    $pipelineVersion = "$\$pipeline-$rev.jar"
+    $pipelineVersion = "$pipeline-$rev.jar"
 
     mvn install:install-file -Dfile="$PSScriptRoot\$pipelineVersion" -DgroupId="org.spigotmc" -DartifactId="spigot" -Dversion="$rev-R0.1-SNAPSHOT" -Dpackaging="jar"
   }
