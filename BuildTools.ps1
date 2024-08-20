@@ -25,10 +25,9 @@ function Build-Revisions {
   Write-Host "Compiling $pipeline for $revision on '$($folder)'"
   $revision -match "\d\.(\d{1,2})(?:\.\d+)?"
 
-  if ($Matches[0] -ge 18) {
+  if ($Matches[1] -ge 18) {
     & "$javaHome\bin\java.exe" -jar $PSScriptRoot\BuildTools.jar --remapped --compile=$pipeline --rev $revision
-  }
-  else {
+  } else {
     & "$javaHome\bin\java.exe" -jar $PSScriptRoot\BuildTools.jar --compile=$pipeline --rev $revision
   }
 
