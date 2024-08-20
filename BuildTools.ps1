@@ -84,7 +84,7 @@ function Invoke-Deploy {
     Where-Object { Test-Path "$PSScriptRoot/$pipeline-$_.jar" }
 
   if ($versions -ne '*') {
-    $revisions = $revisions | Where-Object { $splitVersions -NotContains $_ }
+    $revisions = $revisions | Where-Object { $splitVersions -Contains $_ }
   }
 
   if ($revisions.Count -eq 0) {
