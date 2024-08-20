@@ -27,7 +27,8 @@ function Build-Revisions {
 
   if ($Matches[0] -ge 18) {
     & "$javaHome\bin\java.exe" -jar $PSScriptRoot\BuildTools.jar --remapped --compile=$pipeline --rev $revision
-  } else {
+  }
+  else {
     & "$javaHome\bin\java.exe" -jar $PSScriptRoot\BuildTools.jar --compile=$pipeline --rev $revision
   }
 
@@ -39,7 +40,7 @@ function Build-Revisions {
 
 function Deploy-Revisions {
   param (
-    [Parameter(Mandatory=$true)] [string[]] $revisions
+    [Parameter(Mandatory = $true)] [string[]] $revisions
   )
 
   foreach ($rev in $revisions) {
@@ -59,14 +60,14 @@ $runtimes = @(
   },
   [PSCustomObject] @{
     Revisions = @('1.17');
-    Binary = $env:JAVA_16_HOME
+    Binary    = $env:JAVA_16_HOME
   }
   [PSCustomObject] @{
     Revisions = @('1.18.1', '1.18.2', '1.19', '1.19.3', '1.20.1', '1.20.2', '1.20.4');
     Binary    = $env:JAVA_17_HOME
   },
   [PSCustomObject] @{
-    Revisions = @('1.20.6');
+    Revisions = @('1.20.6', '1.21', '1.21.1');
     Binary    = $env:JAVA_21_HOME
   }
 )
@@ -81,7 +82,7 @@ function Invoke-Build {
 
 function Invoke-Deploy {
   $revisions = Foreach-Object -InputObject $runtimes -Process { $_.Revisions } |
-    Where-Object { Test-Path "$PSScriptRoot/$pipeline-$_.jar" }
+  Where-Object { Test-Path "$PSScriptRoot/$pipeline-$_.jar" }
 
   if ($versions -ne '*') {
     $revisions = $revisions | Where-Object { $splitVersions -Contains $_ }
