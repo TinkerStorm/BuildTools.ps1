@@ -36,15 +36,15 @@ function Build-Revisions {
     $Args[-1] += ",craftbukkit"
 
     # if $revision is 1.18.x or up, while on spigot add --remapped
-  if ([int]$Matches[1] -ge 18) {
-    $Args += "--remapped"
+    if ([int]$Matches[1] -ge 18) {
+      $Args += "--remapped"
     }
   }
 
   & "$javaHome\bin\java.exe" -jar $PSScriptRoot\BuildTools.jar @Args
 
   if ($LASTEXITCODE -ne 0) {
-    Write-Host "Error occurred for $revision on $folder using $pipeline"
+    Write-Host "Error occurred for $revision on $folder using $pipeline ($LASTEXITCODE)"
     exit $LASTEXITCODE
   }
 }

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Added
 
+- `$LASTEXITCODE` with error print
 - Refactor jar argument spec for 1.14.x to include craftbukkit when compiling for spigot
 
 # Changed
