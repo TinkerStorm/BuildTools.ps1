@@ -30,8 +30,15 @@ function Build-Revisions {
     "--rev=$revision"
   )
 
+  # if $pipeline == spigot and mc revision is 1.14.x or up, add craftbukkit
+  if ($pipeline.ToLower() -eq "spigot" -and [int]$Matches[1] -ge 14)
+  {
+    $Args[-1] += ",craftbukkit"
+
+    # if $revision is 1.18.x or up, while on spigot add --remapped
   if ([int]$Matches[1] -ge 18) {
     $Args += "--remapped"
+    }
   }
 
   & "$javaHome\bin\java.exe" -jar $PSScriptRoot\BuildTools.jar @Args
